@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Cadastro - Fornecedor/Cliente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .logo-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .question-container {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .question-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .question-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            margin: 10px 0;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            margin: 10px 0;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .radio-group label:hover {
+            background: #f5f5f5;
+        }
+
+        .radio-group input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"]:checked + span {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .success-message h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .success-message p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .result-code {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 18px;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .error {
+            border-color: #f44336 !important;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .step-indicator {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .dynamic-fields {
+            margin-top: 20px;
+        }
+
+        .item-row {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .item-row h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .btn-add {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+
+        .btn-remove {
+            background: #f44336;
+            color: white;
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-header">
+            <h1>📋 Cadastro de Fornecedor/Cliente</h1>
+            <p>COLUMBIA MACHINE BRASIL - FORM-09.52 Rev.: 00</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="step-indicator" id="stepIndicator">Pergunta 1 de 9</div>
+
+        <!-- Pergunta 1: Tipo de Cadastro -->
+        <div class="question-container active" data-question="1">
+            <h2 class="question-title">Qual o tipo de cadastro?</h2>
+            <p class="question-subtitle">Selecione se você é fornecedor ou cliente</p>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="tipo_cadastro" value="fornecedor" onchange="updateQuestionFlow()">
+                    <span>🏭 Fornecedor</span>
+                </label>
+                <label>
+                    <input type="radio" name="tipo_cadastro" value="cliente" onchange="updateQuestionFlow()">
+                    <span>🛒 Cliente</span>
+                </label>
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" disabled>Anterior</button>
+                <button class="btn-primary" onclick="nextQuestion()">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Pergunta 2: Razão Social -->
+        <div class="question-container" data-question="2">
+            <h2 class="question-title">Qual a Razão Social da empresa?</h2>
+            <div class="input-group">
+                <label>Razão Social Completa *</label>
+                <input type="text" id="razao_social" placeholder="Ex: EMPRESA EXEMPLO LTDA" required>
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="previousQuestion()">Anterior</button>
+                <button class="btn-primary" onclick="nextQuestion()">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Pergunta 3: CNPJ e Inscrição Estadual -->
+        <div class="question-container" data-question="3">
+            <h2 class="question-title">Dados fiscais da empresa</h2>
+            <div class="input-group">
+                <label>CNPJ *</label>
+                <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+            </div>
+            <div class="input-group">
+                <label>Inscrição Estadual</label>
+                <input type="text" id="inscricao_estadual" placeholder="000.000.000.000">
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="previousQuestion()">Anterior</button>
+                <button class="btn-primary" onclick="nextQuestion()">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Pergunta 4: Endereço -->
+        <div class="question-container" data-question="4">
+            <h2 class="question-title">Qual o endereço completo?</h2>
+            <div class="input-group">
+                <label>Endereço Completo *</label>
+                <input type="text" id="endereco" placeholder="Rua, número, complemento">
+            </div>
+            <div class="input-group">
+                <label>Município/UF *</label>
+                <input type="text" id="municipio_uf" placeholder="São Paulo/SP">
+            </div>
+            <div class="input-group">
+                <label>CEP *</label>
+                <input type="text" id="cep" placeholder="00000-000" maxlength="9">
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="previousQuestion()">Anterior</button>
+                <button class="btn-primary" onclick="nextQuestion()">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Pergunta 5: Informações Tributárias -->
+        <div class="question-container" data-question="5">
+            <h2 class="question-title">Informações tributárias</h2>
+            <p class="question-subtitle">Selecione todas as opções que se aplicam</p>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="contrib_icms">
+                    <span>Contribuinte do ICMS</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="beneficio_fiscal">
+                    <span>Possui Benefício Fiscal</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="simples_nacional">
+                    <span>Optante do Simples Nacional</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="mei">
+                    <span>Optante do MEI/Nanoempreendedor</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="isento_nfe">
+                    <span>Isento de Emissão NFe</span>
+                </label>
+            </div>
+            <div class="input-group">
+                <label>Regime Tributário</label>
+                <select id="regime_tributario">
+                    <option value="">Selecione...</option>
+                    <option value="lucro_real">Lucro Real</option>
+                    <option value="lucro_presumido">Lucro Presumido</option>
+                    <option value="simples_nacional">Simples Nacional</option>
+                    <option value="mei">MEI</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="previousQuestion()">Anterior</button>
+                <button class="btn-primary" onclick="nextQuestion()">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Pergunta 6: Contatos -->
+        <div class="question-container" data-question="6">
+            <h2 class="question-title">Informações de contato</h2>
+            <p class="question-subtitle">Para envio de NFe e comunicações</p>
+            <div class="input-group">
+                <label>Nome do Contato Principal *</label>
+                <input type="text" id="contato_nome" placeholder="Nome completo">
+            </div>
+            <div class="input-group">
+                <label>E-mail para NFe *</label>
+                <input type="email" id="contato_email" placeholder="email@empresa.com.br">
+            </div>
+            <div class="input-group">
+                <label>Telefone *</label>
+                <input type="text" id="contato_telefone" placeholder="(00) 00000-0000">
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="previousQuestion()">Anterior</button>
+                <button class="btn-primary" onclick="nextQuestion()">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Pergunta 7: Transporte (APENAS PARA CLIENTES) -->
+        <div class="question-container" data-question="7" id="transporteQuestion">
+            <h2 class="question-title">Deseja informar uma transportadora de confiança?</h2>
+            <p class="question-subtitle">Caso tenha uma transportadora preferencial</p>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="informar_transportadora" value="sim" onchange="toggleTransporteFields(true)">
+                    <span>✅ Sim</span>
+                </label>
+                <label>
+                    <input type="radio" name="informar_transportadora" value="nao" onchange="toggleTransporteFields(false)">
+                    <span>❌ Não</span>
+                </label>
+            </div>
+            <div id="transporteFields" style="display: none;" class="dynamic-fields">
+                <h3 style="color: #667eea; margin-bottom: 15px;">Dados da Transportadora</h3>
+                <div class="input-group">
+                    <label>Nome da Transportadora</label>
+                    <input type="text" id="transp_nome">
+                </div>
+                <div class="input-group">
+                    <label>Telefone da Transportadora</label>
+                    <input type="text" id="transp_telefone" placeholder="(00) 00000-0000">
+                </div>
+                <div class="input-group">
+                    <label>Contato (Nome da Pessoa)</label>
+                    <input type="text" id="transp_contato">
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="previousQuestion()">Anterior</button>
+                <button class="btn-primary" onclick="nextQuestion()">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Pergunta 8: Produtos/Serviços (APENAS PARA FORNECEDORES) -->
+        <div class="question-container" data-question="8" id="produtosQuestion">
+            <h2 class="question-title">Produtos ou Serviços</h2>
+            <p class="question-subtitle">Detalhe os itens fornecidos</p>
+            <div id="produtosContainer"></div>
+            <button class="btn-add" onclick="addProduto()">➕ Adicionar Produto/Serviço</button>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="previousQuestion()">Anterior</button>
+                <button class="btn-primary" onclick="nextQuestion()">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Pergunta 9: Dados Bancários -->
+        <div class="question-container" data-question="9">
+            <h2 class="question-title">Dados bancários (opcional)</h2>
+            <div class="input-group">
+                <label>Banco</label>
+                <input type="text" id="banco" placeholder="Nome do banco">
+            </div>
+            <div class="input-group">
+                <label>Agência</label>
+                <input type="text" id="agencia" placeholder="0000">
+            </div>
+            <div class="input-group">
+                <label>Conta</label>
+                <input type="text" id="conta" placeholder="00000-0">
+            </div>
+            <div class="input-group">
+                <label>Tipo de Conta</label>
+                <select id="tipo_conta">
+                    <option value="">Selecione...</option>
+                    <option value="corrente">Conta Corrente</option>
+                    <option value="poupanca">Conta Poupança</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="previousQuestion()">Anterior</button>
+                <button class="btn-primary" onclick="nextQuestion()">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Pergunta 10: Observações -->
+        <div class="question-container" data-question="10">
+            <h2 class="question-title">Observações adicionais</h2>
+            <p class="question-subtitle">Informações complementares que julgar necessárias</p>
+            <div class="input-group">
+                <label>Observações</label>
+                <textarea id="observacoes" placeholder="Digite aqui qualquer informação adicional..."></textarea>
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="previousQuestion()">Anterior</button>
+                <button class="btn-primary" onclick="nextQuestion()">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Pergunta 11: Revisão e Confirmação -->
+        <div class="question-container" data-question="11">
+            <h2 class="question-title">✅ Revisão dos dados</h2>
+            <p class="question-subtitle">Confira as informações antes de enviar</p>
+            <div id="reviewData" style="background: #f9f9f9; padding: 20px; border-radius: 8px; max-height: 400px; overflow-y: auto;"></div>
+            <div class="checkbox-group" style="margin-top: 20px;">
+                <label>
+                    <input type="checkbox" id="confirmacao">
+                    <span><strong>Confirmo que todas as informações estão corretas</strong></span>
+                </label>
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="previousQuestion()">Anterior</button>
+                <button class="btn-primary" onclick="submitForm()">Enviar Cadastro</button>
+            </div>
+        </div>
+
+        <!-- Mensagem de Sucesso -->
+        <div class="success-message">
+            <div class="success-icon">✅</div>
+            <h2>Cadastro enviado com sucesso!</h2>
+            <p>Seu cadastro foi recebido e está sendo processado.</p>
+            <div class="result-code">Código: <span id="codigoCadastro"></span></div>
+            <p style="font-size: 14px; color: #999;">Guarde este código para consultas futuras</p>
+            <button class="btn-primary" onclick="downloadJSON()">📥 Baixar Dados (JSON)</button>
+            <button class="btn-primary" style="margin-left: 10px;" onclick="location.reload()">🔄 Novo Cadastro</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let totalQuestions = 11;
+        let produtos = [];
+        let questionFlow = [];
+        let tipoCadastro = '';
+
+        // Inicializar fluxo de perguntas
+        function updateQuestionFlow() {
+            const tipo = document.querySelector('input[name="tipo_cadastro"]:checked')?.value;
+            tipoCadastro = tipo;
+            
+            // Perguntas base (sempre aparecem)
+            questionFlow = [1, 2, 3, 4, 5, 6];
+            
+            // Se for CLIENTE, adiciona pergunta de transporte
+            if (tipo === 'cliente') {
+                questionFlow.push(7); // Transporte
+            }
+            
+            // Se for FORNECEDOR, adiciona pergunta de produtos
+            if (tipo === 'fornecedor') {
+                questionFlow.push(8); // Produtos
+            }
+            
+            // Perguntas finais (sempre aparecem)
+            questionFlow.push(9, 10, 11); // Dados bancários, Observações, Revisão
+            
+            totalQuestions = questionFlow.length;
+        }
+
+        // Inicializar com um produto vazio para fornecedores
+        function initProdutos() {
+            if (produtos.length === 0) {
+                addProduto();
+            }
+        }
+
+        function updateProgress() {
+            const currentIndex = questionFlow.indexOf(currentQuestion);
+            const progress = ((currentIndex + 1) / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('stepIndicator').textContent = `Pergunta ${currentIndex + 1} de ${totalQuestions}`;
+        }
+
+        function showQuestion(questionNumber) {
+            document.querySelectorAll('.question-container').forEach(q => {
+                q.classList.remove('active');
+            });
+            const question = document.querySelector(`[data-question="${questionNumber}"]`);
+            if (question) {
+                question.classList.add('active');
+                
+                // Se for a pergunta de produtos e for fornecedor, inicializar
+                if (questionNumber === 8 && tipoCadastro === 'fornecedor') {
+                    initProdutos();
+                }
+                
+                // Se for a pergunta de revisão, gerar preview
+                if (questionNumber === 11) {
+                    generateReview();
+                }
+            }
+            currentQuestion = questionNumber;
+            updateProgress();
+        }
+
+        function nextQuestion() {
+            if (validateCurrentQuestion()) {
+                const currentIndex = questionFlow.indexOf(currentQuestion);
+                if (currentIndex < questionFlow.length - 1) {
+                    const nextQuestionNum = questionFlow[currentIndex + 1];
+                    showQuestion(nextQuestionNum);
+                }
+            }
+        }
+
+        function previousQuestion() {
+            const currentIndex = questionFlow.indexOf(currentQuestion);
+            if (currentIndex > 0) {
+                const prevQuestionNum = questionFlow[currentIndex - 1];
+                showQuestion(prevQuestionNum);
+            }
+        }
+
+        function validateCurrentQuestion() {
+            const currentContainer = document.querySelector(`[data-question="${currentQuestion}"]`);
+            
+            // Validação especial para pergunta 1 (tipo de cadastro)
+            if (currentQuestion === 1) {
+                const selected = document.querySelector('input[name="tipo_cadastro"]:checked');
+                if (!selected) {
+                    alert('Por favor, selecione o tipo de cadastro.');
+                    return false;
+                }
+                updateQuestionFlow();
+                return true;
+            }
+            
+            const requiredInputs = currentContainer.querySelectorAll('input[required], input[type="text"]:not([id^="transp_"]):not(.prod-), input[type="email"]');
+            
+            for (let input of requiredInputs) {
+                if (input.hasAttribute('required') && !input.value) {
+                    alert('Por favor, preencha todos os campos obrigatórios.');
+                    input.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function toggleTransporteFields(show) {
+            document.getElementById('transporteFields').style.display = show ? 'block' : 'none';
+        }
+
+        function addProduto() {
+            const container = document.getElementById('produtosContainer');
+            const index = produtos.length;
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item-row';
+            itemDiv.innerHTML = `
+                <h4>Produto/Serviço ${index + 1}</h4>
+                <div class="input-group">
+                    <label>Código do Produto/Serviço</label>
+                    <input type="text" class="prod-codigo" data-index="${index}">
+                </div>
+                <div class="input-group">
+                    <label>Descrição</label>
+                    <input type="text" class="prod-descricao" data-index="${index}">
+                </div>
+                <div class="input-group">
+                    <label>Unidade de Medida</label>
+                    <input type="text" class="prod-unidade" data-index="${index}" placeholder="Ex: UN, KG, M">
+                </div>
+                <div class="input-group">
+                    <label>NCM</label>
+                    <input type="text" class="prod-ncm" data-index="${index}">
+                </div>
+                <div class="input-group">
+                    <label>CST</label>
+                    <input type="text" class="prod-cst" data-index="${index}">
+                </div>
+                ${index > 0 ? `<button class="btn-remove" onclick="removeProduto(${index})">🗑️ Remover</button>` : ''}
+            `;
+            
+            container.appendChild(itemDiv);
+            produtos.push({});
+        }
+
+        function removeProduto(index) {
+            const container = document.getElementById('produtosContainer');
+            const items = container.querySelectorAll('.item-row');
+            if (items[index]) {
+                items[index].remove();
+                produtos.splice(index, 1);
+            }
+        }
+
+        function collectFormData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                tipo_cadastro: tipoCadastro,
+                dados_empresa: {
+                    razao_social: document.getElementById('razao_social').value,
+                    cnpj: document.getElementById('cnpj').value,
+                    inscricao_estadual: document.getElementById('inscricao_estadual').value,
+                    endereco: {
+                        logradouro: document.getElementById('endereco').value,
+                        municipio_uf: document.getElementById('municipio_uf').value,
+                        cep: document.getElementById('cep').value
+                    }
+                },
+                informacoes_tributarias: {
+                    contribuinte_icms: document.getElementById('contrib_icms').checked,
+                    beneficio_fiscal: document.getElementById('beneficio_fiscal').checked,
+                    simples_nacional: document.getElementById('simples_nacional').checked,
+                    mei: document.getElementById('mei').checked,
+                    isento_nfe: document.getElementById('isento_nfe').checked,
+                    regime_tributario: document.getElementById('regime_tributario').value
+                },
+                contato: {
+                    nome: document.getElementById('contato_nome').value,
+                    email: document.getElementById('contato_email').value,
+                    telefone: document.getElementById('contato_telefone').value
+                },
+                dados_bancarios: {
+                    banco: document.getElementById('banco').value,
+                    agencia: document.getElementById('agencia').value,
+                    conta: document.getElementById('conta').value,
+                    tipo_conta: document.getElementById('tipo_conta').value
+                },
+                observacoes: document.getElementById('observacoes').value
+            };
+            
+            // Adicionar dados específicos de CLIENTE
+            if (tipoCadastro === 'cliente') {
+                const informarTransp = document.querySelector('input[name="informar_transportadora"]:checked')?.value;
+                data.transportadora = {
+                    informar: informarTransp || 'nao',
+                    dados: informarTransp === 'sim' ? {
+                        nome: document.getElementById('transp_nome')?.value || '',
+                        telefone: document.getElementById('transp_telefone')?.value || '',
+                        contato: document.getElementById('transp_contato')?.value || ''
+                    } : null
+                };
+            }
+            
+            // Adicionar dados específicos de FORNECEDOR
+            if (tipoCadastro === 'fornecedor') {
+                data.produtos_servicos = collectProdutos();
+            }
+            
+            return data;
+        }
+
+        function collectProdutos() {
+            const produtos = [];
+            const items = document.querySelectorAll('.item-row');
+            
+            items.forEach((item, index) => {
+                produtos.push({
+                    codigo: item.querySelector('.prod-codigo')?.value || '',
+                    descricao: item.querySelector('.prod-descricao')?.value || '',
+                    unidade: item.querySelector('.prod-unidade')?.value || '',
+                    ncm: item.querySelector('.prod-ncm')?.value || '',
+                    cst: item.querySelector('.prod-cst')?.value || ''
+                });
+            });
+            
+            return produtos;
+        }
+
+        function generateReview() {
+            const data = collectFormData();
+            const reviewDiv = document.getElementById('reviewData');
+            
+            let html = `
+                <h3 style="color: #667eea; margin-bottom: 15px;">📋 Dados do Cadastro</h3>
+                <p><strong>Tipo:</strong> ${data.tipo_cadastro === 'fornecedor' ? '🏭 Fornecedor' : '🛒 Cliente'}</p>
+                <p><strong>Razão Social:</strong> ${data.dados_empresa.razao_social}</p>
+                <p><strong>CNPJ:</strong> ${data.dados_empresa.cnpj}</p>
+                <p><strong>Endereço:</strong> ${data.dados_empresa.endereco.logradouro}, ${data.dados_empresa.endereco.municipio_uf}</p>
+                <p><strong>Contato:</strong> ${data.contato.nome} (${data.contato.email})</p>
+                <p><strong>Telefone:</strong> ${data.contato.telefone}</p>
+                <hr style="margin: 15px 0;">
+            `;
+            
+            // Se for fornecedor, mostrar produtos
+            if (tipoCadastro === 'fornecedor') {
+                html += `<h4 style="color: #667eea;">Produtos/Serviços: ${data.produtos_servicos.length} item(ns)</h4>`;
+            }
+            
+            // Se for cliente, mostrar info de transportadora
+            if (tipoCadastro === 'cliente') {
+                if (data.transportadora.informar === 'sim') {
+                    html += `<h4 style="color: #667eea;">Transportadora: ${data.transportadora.dados.nome}</h4>`;
+                } else {
+                    html += `<p><strong>Transportadora:</strong> Não informada</p>`;
+                }
+            }
+            
+            reviewDiv.innerHTML = html;
+        }
+
+        function submitForm() {
+            if (!document.getElementById('confirmacao').checked) {
+                alert('Por favor, confirme que as informações estão corretas.');
+                return;
+            }
+
+            const data = collectFormData();
+            const codigo = 'CAD-' + Date.now();
+            
+            // Salvar no localStorage
+            localStorage.setItem(codigo, JSON.stringify(data));
+            localStorage.setItem('lastCadastro', codigo);
+            
+            // Mostrar sucesso
+            document.getElementById('codigoCadastro').textContent = codigo;
+            document.querySelector('.container').style.display = 'none';
+            setTimeout(() => {
+                document.querySelector('.success-message').classList.add('active');
+            }, 300);
+        }
+
+        function downloadJSON() {
+            const codigo = document.getElementById('codigoCadastro').textContent;
+            const data = JSON.parse(localStorage.getItem(codigo));
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cadastro_${codigo}.json`;
+            a.click();
+        }
+
+        // Máscaras
+        document.getElementById('cnpj').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+            value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+            value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+            e.target.value = value;
+        });
+
+        document.getElementById('cep').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+            e.target.value = value;
+        });
+
+        // Inicializar
+        updateProgress();
+    </script>
+</body>
+</html>
