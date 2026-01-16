@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Cadastros</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-fornecedor {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-cliente {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            margin-right: 5px;
+        }
+
+        .btn-view {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #45a049;
+        }
+
+        .btn-export {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #1976d2;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #d32f2f;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            font-size: 28px;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 30px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .detail-section {
+            margin-bottom: 25px;
+        }
+
+        .detail-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .modal-content, .modal-content * {
+                visibility: visible;
+            }
+            .modal-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .action-buttons, .close-modal {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Painel Administrativo de Cadastros</h1>
+        <p>COLUMBIA MACHINE BRASIL - Sistema de Gerenciamento de Fornecedores e Clientes</p>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-number" id="totalCadastros">0</div>
+            <div class="stat-label">Total de Cadastros</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="totalFornecedores">0</div>
+            <div class="stat-label">Fornecedores</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="totalClientes">0</div>
+            <div class="stat-label">Clientes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="cadastrosHoje">0</div>
+            <div class="stat-label">Cadastros Hoje</div>
+        </div>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 Buscar por razão social, CNPJ, código..." onkeyup="filterTable()">
+    </div>
+
+    <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterByType('todos')">Todos</button>
+        <button class="filter-btn" onclick="filterByType('fornecedor')">Fornecedores</button>
+        <button class="filter-btn" onclick="filterByType('cliente')">Clientes</button>
+        <button class="filter-btn" onclick="exportAllData()">📥 Exportar Todos</button>
+        <button class="filter-btn" onclick="clearAllData()" style="border-color: #f44336; color: #f44336;">🗑️ Limpar Dados</button>
+    </div>
+
+    <div class="table-container">
+        <table id="cadastrosTable">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Tipo</th>
+                    <th>Razão Social</th>
+                    <th>CNPJ</th>
+                    <th>Contato</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+                <h2 id="modalTitle">Detalhes do Cadastro</h2>
+            </div>
+            <div id="modalBody"></div>
+            <div class="action-buttons">
+                <button class="btn btn-export" onclick="printCadastro()">🖨️ Imprimir</button>
+                <button class="btn btn-export" onclick="exportCurrentCadastro()">📥 Exportar JSON</button>
+                <button class="btn btn-export" onclick="exportToExcel()">📊 Exportar Excel</button>
+                <button class="btn btn-delete" onclick="deleteCadastro()">🗑️ Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCodigo = null;
+        let currentFilter = 'todos';
+
+        function loadCadastros() {
+            const keys = Object.keys(localStorage);
+            const cadastros = [];
+            
+            keys.forEach(key => {
+                if (key.startsWith('CAD-')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        cadastros.push({
+                            codigo: key,
+                            data: data
+                        });
+                    } catch (e) {
+                        console.error('Erro ao carregar cadastro:', e);
+                    }
+                }
+            });
+            
+            return cadastros;
+        }
+
+        function updateStats() {
+            const cadastros = loadCadastros();
+            const fornecedores = cadastros.filter(c => c.data.tipo_cadastro === 'fornecedor').length;
+            const clientes = cadastros.filter(c => c.data.tipo_cadastro === 'cliente').length;
+            
+            const hoje = new Date().toDateString();
+            const cadastrosHoje = cadastros.filter(c => {
+                const dataCadastro = new Date(c.data.timestamp).toDateString();
+                return dataCadastro === hoje;
+            }).length;
+            
+            document.getElementById('totalCadastros').textContent = cadastros.length;
+            document.getElementById('totalFornecedores').textContent = fornecedores;
+            document.getElementById('totalClientes').textContent = clientes;
+            document.getElementById('cadastrosHoje').textContent = cadastrosHoje;
+        }
+
+        function renderTable() {
+            const cadastros = loadCadastros();
+            const tbody = document.getElementById('tableBody');
+            
+            if (cadastros.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📭</div>
+                                <h3>Nenhum cadastro encontrado</h3>
+                                <p>Os cadastros aparecerão aqui quando forem preenchidos</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Ordenar por data (mais recente primeiro)
+            cadastros.sort((a, b) => new Date(b.data.timestamp) - new Date(a.data.timestamp));
+            
+            tbody.innerHTML = '';
+            cadastros.forEach(cadastro => {
+                const data = cadastro.data;
+                const tipo = data.tipo_cadastro || 'N/A';
+                
+                // Aplicar filtro
+                if (currentFilter !== 'todos' && tipo !== currentFilter) {
+                    return;
+                }
+                
+                const dataFormatada = new Date(data.timestamp).toLocaleString('pt-BR');
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${cadastro.codigo}</strong></td>
+                    <td><span class="badge badge-${tipo}">${tipo.toUpperCase()}</span></td>
+                    <td>${data.dados_empresa?.razao_social || 'N/A'}</td>
+                    <td>${data.dados_empresa?.cnpj || 'N/A'}</td>
+                    <td>${data.contato?.email || 'N/A'}</td>
+                    <td>${dataFormatada}</td>
+                    <td>
+                        <button class="btn btn-view" onclick="viewDetails('${cadastro.codigo}')">👁️ Ver</button>
+                        <button class="btn btn-export" onclick="exportCadastro('${cadastro.codigo}')">📥</button>
+                        <button class="btn btn-delete" onclick="confirmDelete('${cadastro.codigo}')">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+
+        function filterByType(type) {
+            currentFilter = type;
+            
+            // Atualizar botões
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderTable();
+        }
+
+        function viewDetails(codigo) {
+            currentCodigo = codigo;
+            const data = JSON.parse(localStorage.getItem(codigo));
+            
+            document.getElementById('modalTitle').textContent = `Cadastro: ${codigo}`;
+            
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="detail-section">
+                    <h3>📋 Informações Gerais</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Tipo de Cadastro:</div>
+                        <div class="detail-value"><span class="badge badge-${data.tipo_cadastro}">${data.tipo_cadastro?.toUpperCase() || 'N/A'}</span></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Data do Cadastro:</div>
+                        <div class="detail-value">${new Date(data.timestamp).toLocaleString('pt-BR')}</div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>🏢 Dados da Empresa</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Razão Social:</div>
+                        <div class="detail-value">${data.dados_empresa?.razao_social || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">CNPJ:</div>
+                        <div class="detail-value">${data.dados_empresa?.cnpj || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Inscrição Estadual:</div>
+                        <div class="detail-value">${data.dados_empresa?.inscricao_estadual || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Endereço:</div>
+                        <div class="detail-value">${data.dados_empresa?.endereco?.logradouro || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Município/UF:</div>
+                        <div class="detail-value">${data.dados_empresa?.endereco?.municipio_uf || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">CEP:</div>
+                        <div class="detail-value">${data.dados_empresa?.endereco?.cep || 'N/A'}</div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>💼 Informações Tributárias</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Contribuinte ICMS:</div>
+                        <div class="detail-value">${data.informacoes_tributarias?.contribuinte_icms ? '✅ Sim' : '❌ Não'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Benefício Fiscal:</div>
+                        <div class="detail-value">${data.informacoes_tributarias?.beneficio_fiscal ? '✅ Sim' : '❌ Não'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Simples Nacional:</div>
+                        <div class="detail-value">${data.informacoes_tributarias?.simples_nacional ? '✅ Sim' : '❌ Não'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">MEI:</div>
+                        <div class="detail-value">${data.informacoes_tributarias?.mei ? '✅ Sim' : '❌ Não'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Regime Tributário:</div>
+                        <div class="detail-value">${data.informacoes_tributarias?.regime_tributario || 'N/A'}</div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>📞 Contato</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Nome:</div>
+                        <div class="detail-value">${data.contato?.nome || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">E-mail:</div>
+                        <div class="detail-value">${data.contato?.email || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Telefone:</div>
+                        <div class="detail-value">${data.contato?.telefone || 'N/A'}</div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>🚚 Transporte</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Possui Transporte Próprio:</div>
+                        <div class="detail-value">${data.transporte?.possui_proprio === 'sim' ? '✅ Sim' : '❌ Não'}</div>
+                    </div>
+                    ${data.transporte?.possui_proprio === 'sim' ? `
+                        <div class="detail-row">
+                            <div class="detail-label">Transportadora:</div>
+                            <div class="detail-value">${data.transporte?.transportadora?.razao_social || 'N/A'}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">CNPJ Transportadora:</div>
+                            <div class="detail-value">${data.transporte?.transportadora?.cnpj || 'N/A'}</div>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="detail-section">
+                    <h3>📦 Produtos/Serviços</h3>
+                    ${data.produtos_servicos?.map((prod, idx) => `
+                        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                            <strong>Item ${idx + 1}</strong><br>
+                            <strong>Código:</strong> ${prod.codigo || 'N/A'}<br>
+                            <strong>Descrição:</strong> ${prod.descricao || 'N/A'}<br>
+                            <strong>Unidade:</strong> ${prod.unidade || 'N/A'}<br>
+                            <strong>NCM:</strong> ${prod.ncm || 'N/A'}<br>
+                            <strong>CST:</strong> ${prod.cst || 'N/A'}
+                        </div>
+                    `).join('') || '<p>Nenhum produto cadastrado</p>'}
+                </div>
+
+                ${data.dados_bancarios?.banco ? `
+                    <div class="detail-section">
+                        <h3>🏦 Dados Bancários</h3>
+                        <div class="detail-row">
+                            <div class="detail-label">Banco:</div>
+                            <div class="detail-value">${data.dados_bancarios.banco}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Agência:</div>
+                            <div class="detail-value">${data.dados_bancarios.agencia}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Conta:</div>
+                            <div class="detail-value">${data.dados_bancarios.conta}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Tipo:</div>
+                            <div class="detail-value">${data.dados_bancarios.tipo_conta}</div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${data.observacoes ? `
+                    <div class="detail-section">
+                        <h3>📝 Observações</h3>
+                        <p>${data.observacoes}</p>
+                    </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+            currentCodigo = null;
+        }
+
+        function exportCadastro(codigo) {
+            const data = JSON.parse(localStorage.getItem(codigo));
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${codigo}.json`;
+            a.click();
+        }
+
+        function exportCurrentCadastro() {
+            if (currentCodigo) {
+                exportCadastro(currentCodigo);
+            }
+        }
+
+        function exportAllData() {
+            const cadastros = loadCadastros();
+            const allData = cadastros.map(c => c.data);
+            
+            const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `todos_cadastros_${Date.now()}.json`;
+            a.click();
+        }
+
+        function exportToExcel() {
+            alert('Exportação para Excel: Em desenvolvimento\n\nPor enquanto, use a exportação JSON que pode ser importada no Excel.');
+        }
+
+        function printCadastro() {
+            window.print();
+        }
+
+        function confirmDelete(codigo) {
+            if (confirm(`Tem certeza que deseja excluir o cadastro ${codigo}?`)) {
+                localStorage.removeItem(codigo);
+                alert('Cadastro excluído com sucesso!');
+                renderTable();
+                updateStats();
+            }
+        }
+
+        function deleteCadastro() {
+            if (currentCodigo) {
+                confirmDelete(currentCodigo);
+                closeModal();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ ATENÇÃO: Isso irá excluir TODOS os cadastros!\n\nDeseja continuar?')) {
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.startsWith('CAD-')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                alert('Todos os cadastros foram excluídos!');
+                renderTable();
+                updateStats();
+            }
+        }
+
+        // Inicializar
+        updateStats();
+        renderTable();
+
+        // Atualizar a cada 5 segundos
+        setInterval(() => {
+            updateStats();
+            renderTable();
+        }, 5000);
+    </script>
+</body>
+</html>
